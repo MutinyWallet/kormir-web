@@ -1,7 +1,3 @@
 export function NotFound() {
-    return (
-        <pre>
-            404
-        </pre>
-    );
+  return <pre>404</pre>;
 }
