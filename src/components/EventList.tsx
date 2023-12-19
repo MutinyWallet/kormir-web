@@ -1,26 +1,24 @@
 import { Collapsible } from "@kobalte/core";
-import { EventData, Kormir } from "@benthecarman/kormir-wasm";
+import { EventData } from "@benthecarman/kormir-wasm";
 import { createResource, For, Show, Suspense } from "solid-js";
 
 import { Button, InnerCard, VStack } from "~/components";
+import { useMegaStore } from "~/state/megaStore";
 
 type RefetchEventsType = (
   info?: unknown,
 ) => EventData[] | Promise<EventData[] | undefined> | null | undefined;
 
-function EventItem(props: {
-  event: EventData;
-  kormir: Kormir | undefined;
-  refetch: RefetchEventsType;
-}) {
+function EventItem(props: { event: EventData; refetch: RefetchEventsType }) {
+  const [state, _actions] = useMegaStore();
   const handleSignEvent = async () => {
     const result = prompt("Choose one of: " + props.event.outcomes.join(", "));
 
-    if (props.kormir == undefined) {
-        return;
+    if (state.kormir == undefined) {
+      return;
     }
 
-    await props.kormir.sign_enum_event(0, result || "");
+    await state.kormir?.sign_enum_event(0, result || "");
   };
 
   return (
@@ -46,28 +44,26 @@ function EventItem(props: {
   );
 }
 
-export function EventList(props: { kormir?: Kormir }) {
-  //console.log("event list: " + props.kormir.get_public_key());
+export function EventList() {
+  const [state, _actions] = useMegaStore();
 
-  const getEvents = async (kormir: any) => {
-    const events =  (await kormir.list_events()) as EventData[];
-    console.log("here: " + events);
+  const getEvents = async () => {
+    const events = (await state.kormir?.list_events()) as EventData[];
+    console.log("events: ", events);
     return events;
   };
 
-  const [events, { refetch }] = createResource(props.kormir, getEvents);
+  const [events, { refetch }] = createResource(getEvents);
 
   return (
     <>
       <InnerCard title="Events">
-        <pre>{props.kormir?.get_public_key()}</pre>
+        <pre>{state.kormir?.get_public_key()}</pre>
         {/* By wrapping this in a suspense I don't cause the page to jump to the top */}
         <Suspense>
           <VStack>
             <For each={events()} fallback={<code>No Events found.</code>}>
-              {(event) => (
-                <EventItem event={event} refetch={refetch} kormir={props.kormir} />
-              )}
+              {(event) => <EventItem event={event} refetch={refetch} />}
             </For>
           </VStack>
         </Suspense>
