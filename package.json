@@ -47,5 +47,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "prettier": {
+    "printWidth": 80
   }
 }
