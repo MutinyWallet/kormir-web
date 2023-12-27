@@ -36,10 +36,11 @@
     "workbox-window": "^7.0.0"
   },
   "dependencies": {
-    "@benthecarman/kormir-wasm": "^0.1.1",
+    "@benthecarman/kormir-wasm": "^0.1.2",
     "@solidjs/meta": "^0.29.3",
     "@solidjs/router": "^0.8.2",
     "@thisbeyond/solid-select": "^0.14.0",
+    "@modular-forms/solid": "^0.18.1",
     "@kobalte/core": "^0.9.8",
     "@kobalte/tailwindcss": "^0.5.0",
     "solid-js": "^1.8.7",

@@ -1,9 +1,10 @@
 import { Collapsible } from "@kobalte/core";
 import { EventData } from "@benthecarman/kormir-wasm";
-import { createResource, For, Show, Suspense } from "solid-js";
+import { createResource, createSignal, For, Show, Suspense } from "solid-js";
 
-import { Button, InnerCard, VStack } from "~/components";
+import { Button, InnerCard, SimpleDialog, VStack } from "~/components";
 import { useMegaStore } from "~/state/megaStore";
+import { EventCreator } from "~/components/EventCreator";
 
 type RefetchEventsType = (
   info?: unknown,
@@ -19,6 +20,8 @@ function EventItem(props: { event: EventData; refetch: RefetchEventsType }) {
     }
 
     await state.kormir?.sign_enum_event(0, result || "");
+
+    props.refetch();
   };
 
   return (
@@ -48,17 +51,29 @@ export function EventList() {
   const [state, _actions] = useMegaStore();
 
   const getEvents = async () => {
-    const events = (await state.kormir?.list_events()) as EventData[];
-    console.log("events: ", events);
-    return events;
+    return (await state.kormir?.list_events()) as EventData[];
   };
 
   const [events, { refetch }] = createResource(getEvents);
 
+  const [dialogOpen, setDialogOpen] = createSignal(false);
+
+  const onClick = async () => {
+    setDialogOpen(true);
+  };
+
+  const onSave = async () => {
+    setDialogOpen(false);
+    await refetch();
+  }
+
   return (
     <>
       <InnerCard title="Events">
-        <pre>{state.kormir?.get_public_key()}</pre>
+        <SimpleDialog open={dialogOpen()} title="New Event">
+          <EventCreator onSave={onSave} />
+        </SimpleDialog>
+        <Button onClick={onClick}>New Event</Button>
         {/* By wrapping this in a suspense I don't cause the page to jump to the top */}
         <Suspense>
           <VStack>
@@ -67,9 +82,6 @@ export function EventList() {
             </For>
           </VStack>
         </Suspense>
-        <Button layout="small" onClick={refetch}>
-          Refresh
-        </Button>
       </InnerCard>
     </>
   );

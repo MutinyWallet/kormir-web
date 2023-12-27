@@ -10,10 +10,10 @@ export function Router() {
     <Switch>
       <Match when={true}>
         <MegaStoreProvider>
-        <Routes>
-          <Route path="/" component={Home} />
-          <Route path="/*all" component={NotFound} />
-        </Routes>
+          <Routes>
+            <Route path="/" component={Home} />
+            <Route path="/*all" component={NotFound} />
+          </Routes>
         </MegaStoreProvider>
       </Match>
     </Switch>

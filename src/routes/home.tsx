@@ -1,4 +1,4 @@
-import { Suspense } from "solid-js";
+import { Show, Suspense } from "solid-js";
 import { EventList } from "~/components";
 import { useMegaStore } from "~/state/megaStore";
 
@@ -11,9 +11,11 @@ export function Home() {
         Kormir
       </h1>
       <pre>{state.kormir?.get_public_key()}</pre>
-      <Suspense>
-        <EventList />
-      </Suspense>
+      <Show when={state.kormir !== undefined}>
+        <Suspense>
+          <EventList />
+        </Suspense>
+      </Show>
       <div class="h-4" />
     </main>
   );
