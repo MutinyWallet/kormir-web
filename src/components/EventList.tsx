@@ -51,7 +51,7 @@ export function EventList() {
   const [state, _actions] = useMegaStore();
 
   const getEvents = async () => {
-    return (await state.kormir?.list_events()) as EventData[];
+    return await state.kormir?.list_events();
   };
 
   const [events, { refetch }] = createResource(getEvents);
@@ -65,7 +65,7 @@ export function EventList() {
   const onSave = async () => {
     setDialogOpen(false);
     await refetch();
-  }
+  };
 
   return (
     <>
