@@ -1,10 +1,10 @@
 import { createStore } from "solid-js/store";
-import initKormir, { Kormir } from "@benthecarman/kormir-wasm";
+import { KormirProxy } from "./kormirProxy";
 import { ParentComponent, createContext, onMount, useContext } from "solid-js";
 
 export type MegaStore = [
   {
-    kormir?: Kormir;
+    kormir?: KormirProxy;
   },
   {
     setup: () => void;
@@ -16,13 +16,12 @@ const MegaStoreContext = createContext<MegaStore>();
 
 export const Provider: ParentComponent = (props) => {
   const [state, setState] = createStore({
-    kormir: undefined as Kormir | undefined,
+    kormir: undefined as KormirProxy | undefined,
   });
 
   const actions = {
     async setup() {
-      await initKormir();
-      const kormir = await Kormir.new(["wss://nostr.mutinywallet.com"]);
+      const kormir = await KormirProxy.new(["wss://nostr.mutinywallet.com"]);
       setState({ kormir });
     },
     async hello() {
