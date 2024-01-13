@@ -1,6 +1,12 @@
 import { createStore } from "solid-js/store";
 import { KormirProxy } from "./kormirProxy";
-import { ParentComponent, createContext, onMount, useContext } from "solid-js";
+import {
+  ParentComponent,
+  Show,
+  createContext,
+  onMount,
+  useContext,
+} from "solid-js";
 
 export type MegaStore = [
   {
@@ -37,7 +43,7 @@ export const Provider: ParentComponent = (props) => {
 
   return (
     <MegaStoreContext.Provider value={store}>
-      {props.children}
+      <Show when={state.kormir !== undefined}>{props.children}</Show>
     </MegaStoreContext.Provider>
   );
 };

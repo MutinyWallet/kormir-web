@@ -4,21 +4,13 @@
 
 body {
   @apply text-white bg-black;
-  @apply bg-fixed bg-no-repeat bg-gradient-to-b from-black to-gray-700;
   overscroll-behavior-y: none;
   min-height: 100.3%;
+  @apply font-sans antialiased;
 }
 
-.bg-gradient {
-  @apply bg-fixed bg-no-repeat bg-gradient-to-b from-black to-[#0b215b];
-}
-
-.bg-gray {
-  @apply bg-fixed bg-no-repeat bg-gradient-to-b from-[hsl(224,5%,5%)] to-[hsl(224,5%,20%)];
-}
-
-.react-modal-sheet-container {
-  @apply !bg-[#262626];
+#root {
+  @apply flex flex-col gap-4 items-center;
 }
 
 a {
@@ -29,7 +21,7 @@ input[type="text"],
 input[type="number"],
 textarea {
   @apply p-4 rounded-xl;
-  @apply text-black;
+  @apply text-white;
   @apply placeholder-[#4E5B7E];
   @apply border-[2px] focus:outline-none focus:ring-2 focus:ring-offset-2  ring-offset-black;
 }
