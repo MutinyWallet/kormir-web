@@ -2,6 +2,7 @@
 import { render } from "solid-js/web";
 
 import "./root.css";
+import "@fontsource-variable/inter";
 
 import { MetaProvider } from "@solidjs/meta";
 import { Router } from "@solidjs/router";

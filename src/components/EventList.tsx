@@ -1,21 +1,42 @@
-import { Collapsible } from "@kobalte/core";
+/* @refresh reload */
 import { EventData } from "@benthecarman/kormir-wasm";
-import { createResource, createSignal, For, Show, Suspense } from "solid-js";
+import {
+  createResource,
+  createSignal,
+  For,
+  JSX,
+  Show,
+  Suspense,
+} from "solid-js";
 
-import { Button, InnerCard, SimpleDialog, VStack } from "~/components";
+import { Button, InnerCard, VStack } from "~/components";
 import { useMegaStore } from "~/state/megaStore";
-import { EventCreator } from "~/components/EventCreator";
 
 type RefetchEventsType = (
   info?: unknown,
 ) => EventData[] | Promise<EventData[] | undefined> | null | undefined;
 
-function EventItem(props: { event: EventData; refetch: RefetchEventsType }) {
+function PreKeyValue(props: { key: string; children: JSX.Element }) {
+  return (
+    <pre class="text-neutral-400">
+      <span class="text-white font-bold">{props.key}</span> {props.children}
+    </pre>
+  );
+}
+
+export function EventItem(props: {
+  event: EventData;
+  refetch?: RefetchEventsType;
+}) {
   const [state, _actions] = useMegaStore();
   const handleSignEvent = async () => {
     const result = prompt("Choose one of: " + props.event.outcomes.join(", "));
 
     if (state.kormir == undefined) {
+      return;
+    }
+
+    if (props.refetch == undefined) {
       return;
     }
 
@@ -25,25 +46,54 @@ function EventItem(props: { event: EventData; refetch: RefetchEventsType }) {
   };
 
   return (
-    <Collapsible.Root>
-      <Collapsible.Trigger class="w-full">
-        <h2 class="truncate rounded bg-neutral-200 px-4 py-2 text-start font-mono text-lg text-black">
-          {">"} {props.event.event_id}
+    <InnerCard>
+      <div class="flex flex-col gap-6">
+        <h2 class="font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
+          {props.event.event_id}
         </h2>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
-        <VStack>
-          <pre class="overflow-x-auto whitespace-pre-wrap break-all">
-            {JSON.stringify(props.event, null, 2)}
-          </pre>
-          <Show when={props.event.attestation == undefined}>
-            <Button intent="green" layout="xs" onClick={handleSignEvent}>
-              Close
+        <div class="flex flex-col gap-2">
+          <PreKeyValue key="Due">
+            {new Date(props.event.event_maturity_epoch * 1000).toLocaleString()}
+          </PreKeyValue>
+          <PreKeyValue key="Announcement">
+            <a
+              class="underline break-all whitespace-pre-wrap"
+              href={`https://njump.me/${props.event.announcement_event_id}`}
+            >
+              {props.event.announcement_event_id}
+            </a>
+          </PreKeyValue>
+          <PreKeyValue key="Outcomes">
+            {props.event.outcomes.join(" | ")}
+          </PreKeyValue>
+        </div>
+        <Show when={props.event.attestation != undefined}>
+          <h2 class="font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
+            observed!
+          </h2>
+          {/* <pre>{JSON.stringify(props.event, null, 2)}</pre> */}
+          <PreKeyValue key="Attestation">
+            <a
+              class="underline break-all whitespace-pre-wrap"
+              href={`https://njump.me/${props.event.attestation_event_id}`}
+            >
+              {props.event.attestation_event_id}
+            </a>
+          </PreKeyValue>
+        </Show>
+
+        {/* <pre class="overflow-x-auto whitespace-pre-wrap break-all">
+        {JSON.stringify(props.event, null, 2)}
+      </pre> */}
+        <Show when={props.event.attestation == undefined}>
+          <div class="self-start">
+            <Button layout="xs" onClick={handleSignEvent}>
+              Observe
             </Button>
-          </Show>
-        </VStack>
-      </Collapsible.Content>
-    </Collapsible.Root>
+          </div>
+        </Show>
+      </div>
+    </InnerCard>
   );
 }
 
@@ -51,10 +101,12 @@ export function EventList() {
   const [state, _actions] = useMegaStore();
 
   const getEvents = async () => {
-    return await state.kormir?.list_events();
+    const events = await state.kormir?.list_events();
+    console.log(events);
+    return events;
   };
 
-  const [events, { refetch }] = createResource(getEvents);
+  const [events, { refetch }] = createResource(state.kormir, getEvents);
 
   const [dialogOpen, setDialogOpen] = createSignal(false);
 
@@ -69,20 +121,14 @@ export function EventList() {
 
   return (
     <>
-      <InnerCard title="Events">
-        <SimpleDialog open={dialogOpen()} title="New Event">
-          <EventCreator onSave={onSave} />
-        </SimpleDialog>
-        <Button onClick={onClick}>New Event</Button>
-        {/* By wrapping this in a suspense I don't cause the page to jump to the top */}
-        <Suspense>
-          <VStack>
-            <For each={events()} fallback={<code>No Events found.</code>}>
-              {(event) => <EventItem event={event} refetch={refetch} />}
-            </For>
-          </VStack>
-        </Suspense>
-      </InnerCard>
+      {/* By wrapping this in a suspense I don't cause the page to jump to the top */}
+      <Suspense>
+        <VStack>
+          <For each={events()} fallback={<code>No Events found.</code>}>
+            {(event) => <EventItem event={event} refetch={refetch} />}
+          </For>
+        </VStack>
+      </Suspense>
     </>
   );
 }
