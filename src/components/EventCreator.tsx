@@ -3,7 +3,6 @@ import {
   minLength,
   required,
   SubmitHandler,
-  remove,
 } from "@modular-forms/solid";
 import { createSignal, For, Show } from "solid-js";
 
@@ -108,7 +107,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
                               type="text"
                               required
                             />
-                            <Button
+                            {/* <Button
                               intent="red"
                               onClick={() =>
                                 remove(creationForm, "outcomes", {
@@ -117,7 +116,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
                               }
                             >
                               x
-                            </Button>
+                            </Button> */}
                           </div>
                         )}
                       </Field>

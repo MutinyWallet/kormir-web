@@ -7,22 +7,30 @@ import {
   onMount,
   useContext,
 } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import init, { Kormir } from "@benthecarman/kormir-wasm";
 
 export type MegaStore = [
   {
     kormir?: KormirProxy;
+    setupStatus: "fresh" | "imported" | "saved";
   },
   {
     setup: () => void;
-    hello: () => void;
+    save: () => void;
+    import: (nsec: string) => Promise<void>;
   },
 ];
 
 const MegaStoreContext = createContext<MegaStore>();
 
 export const Provider: ParentComponent = (props) => {
+  const navigate = useNavigate();
   const [state, setState] = createStore({
     kormir: undefined as KormirProxy | undefined,
+    setupStatus:
+      (localStorage.getItem("setupStatus") as "fresh" | "imported" | "saved") ||
+      "fresh",
   });
 
   const actions = {
@@ -30,8 +38,25 @@ export const Provider: ParentComponent = (props) => {
       const kormir = await KormirProxy.new(["wss://nostr.mutinywallet.com"]);
       setState({ kormir });
     },
-    async hello() {
-      console.log("Hello");
+    save() {
+      localStorage.setItem("setupStatus", "saved");
+      setState({ setupStatus: "saved" });
+      navigate("/");
+    },
+    async import(nsec: string) {
+      try {
+        console.log("importing nsec: ", nsec);
+        const _kor = await init();
+        await Kormir.restore(nsec);
+        // await state.kormir?.restore(nsec);
+        // const pubkey = await state.kormir?.get_public_key();
+        // console.log("pubkey: ", pubkey);
+        setState({ setupStatus: "imported" });
+        localStorage.setItem("setupStatus", "imported");
+        // window.location.href = "/";
+      } catch (e) {
+        console.error(e);
+      }
     },
   };
 

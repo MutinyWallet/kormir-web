@@ -1,13 +1,12 @@
+import { useNavigate } from "@solidjs/router";
 import { Header } from "~/components";
 import { EventCreator } from "~/components/EventCreator";
-import { useMegaStore } from "~/state/megaStore";
 
 export function New() {
-  const [state, _actions] = useMegaStore();
+  const navigate = useNavigate();
 
   const onSave = async () => {
-    // setDialogOpen(false);
-    // await refetch();
+    navigate("/");
   };
 
   return (

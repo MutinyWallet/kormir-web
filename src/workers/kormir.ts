@@ -39,7 +39,17 @@ self.onconnect = (e: MessageEvent) => {
         ]);
         kormirInstances[id] = kormirInstance;
         port.postMessage({ id, result: "Instance created" });
-      } else if (kormirInstances[id]) {
+        return;
+      }
+
+      if (method === "restore") {
+        console.log("Restoring instance");
+        await Kormir.restore(args[0]);
+        port.postMessage({ id, result: "Instance restored" });
+        return;
+      }
+
+      if (kormirInstances[id]) {
         const kormirInstance = kormirInstances[id];
         // Methods are called based on the name provided in the message.
         // TypeScript doesn't know what methods are available on kormirInstance,
