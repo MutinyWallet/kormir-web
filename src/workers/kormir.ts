@@ -11,6 +11,7 @@ const kormirInstances: KormirInstanceMap = {};
 // Initialize the Kormir Wasm module once at the worker startup.
 let wasmInitialized = false;
 
+// @ts-expect-error idk why onconnect isn't on self
 self.onconnect = (e: MessageEvent) => {
   const port = e.ports[0];
 
@@ -54,6 +55,8 @@ self.onconnect = (e: MessageEvent) => {
         // Methods are called based on the name provided in the message.
         // TypeScript doesn't know what methods are available on kormirInstance,
         // so we need to use a type assertion here.
+
+        // @ts-expect-error this works but typescript is mad
         const result = await kormirInstance[method as KormirMethodNames](
           ...args,
         );
