@@ -1,4 +1,4 @@
-# Kormir Web
+# Superposition Web
 
 ```
 pnpm install

@@ -79,9 +79,9 @@ export function EventItem(props: {
       </pre> */}
         <Show
           when={
-            props.event.attestation == undefined &&
-            !props.solo &&
-            props.event.event_maturity_epoch < Date.now() / 1000
+            props.event.attestation == undefined && !props.solo
+            // TODO: have some sort of "confirm" state for observing early
+            // && props.event.event_maturity_epoch < Date.now() / 1000
           }
         >
           <div class="self-start">

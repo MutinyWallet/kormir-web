@@ -82,7 +82,7 @@ export function SuperPosition() {
           <Show when={event()}>
             <EventItem event={event()!} solo />
             <Switch>
-              <Match
+              {/* <Match
                 when={(event()?.event_maturity_epoch || 0) > Date.now() / 1000}
               >
                 <p>
@@ -92,7 +92,7 @@ export function SuperPosition() {
                   ).toLocaleDateString()}{" "}
                   to observe it.
                 </p>
-              </Match>
+              </Match> */}
               <Match when={event()?.attestation === null}>
                 <div class="flex flex-col gap-4">
                   <h2 class="text-2xl font-bold">Observe!</h2>

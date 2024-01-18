@@ -7,7 +7,7 @@ import { Router } from "~/router";
 export default function App() {
   return (
     <Suspense>
-      <Title>Kormir</Title>
+      <Title>Superposition</Title>
       <Router />
       <div class="h-8" />
     </Suspense>
