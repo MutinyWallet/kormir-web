@@ -1,4 +1,3 @@
-import * as child from "child_process";
 import * as path from "path";
 import autoprefixer from "autoprefixer";
 import tailwindcss from "tailwindcss";
@@ -9,59 +8,48 @@ import wasm from "vite-plugin-wasm";
 
 import manifest from "./manifest";
 
-const commitHash =
-    process.env.VITE_COMMIT_HASH ??
-    child.execSync("git rev-parse --short HEAD").toString().trim();
-
 const pwaOptions: Partial<VitePWAOptions> = {
   base: "/",
   registerType: "prompt",
   devOptions: {
-    enabled: false
+    enabled: false,
   },
   workbox: {
     navigateFallback: "/index.html",
     globPatterns: ["**/*.{js,css,html,svg,png,gif,wasm}"],
     // mutiny_wasm is 10mb, so we'll do 25mb to be safe
-    maximumFileSizeToCacheInBytes: 25 * 1024 * 1024
+    maximumFileSizeToCacheInBytes: 25 * 1024 * 1024,
   },
   includeAssets: ["favicon.ico", "robots.txt"],
-  manifest: manifest
+  manifest: manifest,
 };
 
 export default defineConfig({
   build: {
     target: "esnext",
     outDir: "dist/public",
-    emptyOutDir: true
+    emptyOutDir: true,
   },
   server: {
     port: 3069,
     fs: {
       // Allow serving files from one level up (so that if mutiny-node is a sibling folder we can use it locally)
-      allow: [".."]
-    }
+      allow: [".."],
+    },
   },
   plugins: [wasm(), solid(), VitePWA(pwaOptions)],
-  define: {
-    "import.meta.env.__COMMIT_HASH__": JSON.stringify(commitHash),
-    "import.meta.env.__RELEASE_VERSION__": JSON.stringify(
-        process.env.npm_package_version
-    )
-  },
   resolve: {
-    alias: [{ find: "~", replacement: path.resolve(__dirname, "./src") }]
+    alias: [{ find: "~", replacement: path.resolve(__dirname, "./src") }],
   },
   optimizeDeps: {
     // Don't want vite to bundle these late during dev causing reload
-    include: [
-    ],
+    include: [],
     // This is necessary because otherwise `vite dev` can't find the wasm
-    exclude: ["@benthecarman/kormir-wasm"]
+    exclude: ["@benthecarman/kormir-wasm"],
   },
   css: {
     postcss: {
-      plugins: [autoprefixer(), tailwindcss()]
-    }
-  }
+      plugins: [autoprefixer(), tailwindcss()],
+    },
+  },
 });

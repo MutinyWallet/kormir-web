@@ -9,7 +9,8 @@ export interface KormirMethods {
     event_maturity_epoch: number,
   ) => Promise<string>;
   sign_enum_event: (id: number, outcome: string) => Promise<string>;
-  list_events: () => Promise<any>;
+  list_events: () => Promise<EventData[]>;
+  restore: (str: string) => Promise<void>;
   // ... other methods as needed
 }
 
@@ -80,7 +81,9 @@ export class KormirProxy {
     return this.sendMessage("list_events", []);
   }
 
-  // ... Add other methods as needed
+  public restore(str: string): Promise<void> {
+    return this.sendMessage("restore", [str]);
+  }
 }
 
 // Utility function to generate unique IDs (implement accordingly)

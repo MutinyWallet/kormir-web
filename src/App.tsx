@@ -9,6 +9,7 @@ export default function App() {
     <Suspense>
       <Title>Kormir</Title>
       <Router />
+      <div class="h-8" />
     </Suspense>
   );
 }

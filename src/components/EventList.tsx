@@ -1,15 +1,9 @@
 /* @refresh reload */
 import { EventData } from "@benthecarman/kormir-wasm";
-import {
-  createResource,
-  createSignal,
-  For,
-  JSX,
-  Show,
-  Suspense,
-} from "solid-js";
+import { A } from "@solidjs/router";
+import { createResource, For, JSX, Show, Suspense } from "solid-js";
 
-import { Button, InnerCard, VStack } from "~/components";
+import { ButtonLink, InnerCard, VStack } from "~/components";
 import { useMegaStore } from "~/state/megaStore";
 
 type RefetchEventsType = (
@@ -26,31 +20,43 @@ function PreKeyValue(props: { key: string; children: JSX.Element }) {
 
 export function EventItem(props: {
   event: EventData;
+  solo?: boolean;
   refetch?: RefetchEventsType;
 }) {
   const [state, _actions] = useMegaStore();
-  const handleSignEvent = async () => {
-    const result = prompt("Choose one of: " + props.event.outcomes.join(", "));
-
-    if (state.kormir == undefined) {
-      return;
-    }
-
-    if (props.refetch == undefined) {
-      return;
-    }
-
-    await state.kormir?.sign_enum_event(0, result || "");
-
-    props.refetch();
-  };
 
   return (
     <InnerCard>
-      <div class="flex flex-col gap-6">
-        <h2 class="font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
-          {props.event.event_id}
-        </h2>
+      <div class="flex flex-col gap-4">
+        <A
+          href={`/sup/${props.event.announcement_event_id}`}
+          class="no-underline"
+        >
+          <h2 class="font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
+            {props.event.event_name}
+          </h2>
+        </A>
+        <Show when={props.event.attestation != undefined}>
+          <div class="bg-white/10 p-2 rounded flex flex-col gap-2">
+            {/* <pre>{JSON.stringify(props.event, null, 2)}</pre> */}
+            <p class="text-sm font-mono bg-white/10 px-1 rounded self-start">
+              Observed
+            </p>
+
+            <p class="py-4 text-center font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
+              {props.event.observed_outcome}
+            </p>
+            <PreKeyValue key="Attestation">
+              <a
+                class="underline break-all whitespace-pre-wrap"
+                href={`https://njump.me/${props.event.attestation_event_id}`}
+              >
+                {props.event.attestation_event_id}
+              </a>
+            </PreKeyValue>
+          </div>
+        </Show>
+
         <div class="flex flex-col gap-2">
           <PreKeyValue key="Due">
             {new Date(props.event.event_maturity_epoch * 1000).toLocaleString()}
@@ -67,29 +73,24 @@ export function EventItem(props: {
             {props.event.outcomes.join(" | ")}
           </PreKeyValue>
         </div>
-        <Show when={props.event.attestation != undefined}>
-          <h2 class="font-semibold text-xl bg-clip-text text-transparent bg-gradient-to-r from-[#eeaeca] to-[#94bbe9]">
-            observed!
-          </h2>
-          {/* <pre>{JSON.stringify(props.event, null, 2)}</pre> */}
-          <PreKeyValue key="Attestation">
-            <a
-              class="underline break-all whitespace-pre-wrap"
-              href={`https://njump.me/${props.event.attestation_event_id}`}
-            >
-              {props.event.attestation_event_id}
-            </a>
-          </PreKeyValue>
-        </Show>
 
         {/* <pre class="overflow-x-auto whitespace-pre-wrap break-all">
         {JSON.stringify(props.event, null, 2)}
       </pre> */}
-        <Show when={props.event.attestation == undefined}>
+        <Show
+          when={
+            props.event.attestation == undefined &&
+            !props.solo &&
+            props.event.event_maturity_epoch < Date.now() / 1000
+          }
+        >
           <div class="self-start">
-            <Button layout="xs" onClick={handleSignEvent}>
+            <ButtonLink
+              layout="xs"
+              href={`/sup/${props.event.announcement_event_id}`}
+            >
               Observe
-            </Button>
+            </ButtonLink>
           </div>
         </Show>
       </div>
@@ -97,27 +98,31 @@ export function EventItem(props: {
   );
 }
 
-export function EventList() {
+export function EventList(props: { filter?: "ready" | "observed" | "notdue" }) {
   const [state, _actions] = useMegaStore();
 
   const getEvents = async () => {
     const events = await state.kormir?.list_events();
-    console.log(events);
-    return events;
+    if (events == undefined) {
+      return [];
+    }
+    const filtered = events.filter((e) => {
+      const due = e.event_maturity_epoch < Date.now() / 1000;
+      const observed = e.attestation_event_id !== null;
+      if (props.filter == "notdue") {
+        return !due;
+      } else if (props.filter == "ready") {
+        return !observed && due;
+      } else if (props.filter == "observed") {
+        return observed;
+      } else {
+        return true;
+      }
+    });
+    return filtered;
   };
 
-  const [events, { refetch }] = createResource(state.kormir, getEvents);
-
-  const [dialogOpen, setDialogOpen] = createSignal(false);
-
-  const onClick = async () => {
-    setDialogOpen(true);
-  };
-
-  const onSave = async () => {
-    setDialogOpen(false);
-    await refetch();
-  };
+  const [events, { refetch }] = createResource(getEvents);
 
   return (
     <>
