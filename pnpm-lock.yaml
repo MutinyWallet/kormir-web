@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@benthecarman/kormir-wasm':
-    specifier: ^0.1.6
-    version: 0.1.6
+    specifier: ^0.1.7
+    version: 0.1.7
   '@fontsource-variable/inter':
     specifier: ^5.0.16
     version: 5.0.16
@@ -1369,8 +1369,8 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
-  /@benthecarman/kormir-wasm@0.1.6:
-    resolution: {integrity: sha512-hVis7ipe2Vul0H6Rg6L6IvOBcUAKrGaOrYz1qX+5FL918oox4DHZcZ5dhJe3zj0pU69fBJWcALtyee7iJJ2wMg==}
+  /@benthecarman/kormir-wasm@0.1.7:
+    resolution: {integrity: sha512-00dTC7JA+V7TmUrMdVYieR0gm4KcSVzO+lSJWeeHJW6m0N919ZiZH7wJoHvbFfvt2O9ecy7dZNdpzznBEavwAg==}
     dev: false
 
   /@esbuild/android-arm64@0.18.20:

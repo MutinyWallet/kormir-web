@@ -10,7 +10,7 @@ type RefetchEventsType = (
   info?: unknown,
 ) => EventData[] | Promise<EventData[] | undefined> | null | undefined;
 
-function PreKeyValue(props: { key: string; children: JSX.Element }) {
+export function PreKeyValue(props: { key: string; children: JSX.Element }) {
   return (
     <pre class="text-neutral-400">
       <span class="text-white font-bold">{props.key}</span> {props.children}

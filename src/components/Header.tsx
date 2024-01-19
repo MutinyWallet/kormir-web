@@ -1,4 +1,5 @@
 import { A, useNavigate } from "@solidjs/router";
+import { Show } from "solid-js";
 import { useMegaStore } from "~/state/megaStore";
 
 export function Header() {
@@ -19,7 +20,12 @@ export function Header() {
       </div>
       <A href="/profile" class="no-underline">
         <div class="text-black bg-white w-8 h-8 rounded-full flex items-center justify-center">
-          {":)"}
+          <Show when={state.profile?.image} fallback={":)"}>
+            <img
+              src={state.profile?.image}
+              class="w-full h-full rounded-full"
+            />
+          </Show>
         </div>
       </A>
     </header>

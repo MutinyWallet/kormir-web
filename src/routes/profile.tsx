@@ -1,6 +1,6 @@
 // import NDK from "@nostr-dev-kit/ndk";
-import { Show, Suspense, createResource } from "solid-js";
-import { Button, Header } from "~/components";
+import { createResource } from "solid-js";
+import { Button, Header, PreKeyValue } from "~/components";
 import { useMegaStore } from "~/state/megaStore";
 import { nip19 } from "nostr-tools";
 
@@ -75,16 +75,16 @@ export function Profile() {
   return (
     <>
       <Header />
-      <main class="flex flex-col items-start w-full p-4 gap-8 max-w-[30rem]">
-        <Suspense>
-          <Show when={pubKey()}>
-            <pre class="break-all whitespace-pre-wrap">{pubKey()?.npub}</pre>
-            {/* <Suspense>
-              <pre>{user()}</pre>
-            </Suspense> */}
-          </Show>
-        </Suspense>
-        {/* </Suspense> */}
+      <main class="flex flex-col items-start w-full p-4 gap-4 max-w-[30rem]">
+        <h2 class="text-2xl font-semibold">{state.profile?.name}</h2>
+        <PreKeyValue key="npub">
+          <a
+            class="whitespace-pre-wrap break-all"
+            href={`https://njump.me/${state.profile?.npub}`}
+          >
+            {state.profile?.npub}
+          </a>
+        </PreKeyValue>
         <Button onClick={signOut}>Sign Out</Button>
       </main>
     </>
