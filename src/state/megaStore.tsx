@@ -35,8 +35,14 @@ export const Provider: ParentComponent = (props) => {
 
   const actions = {
     async setup() {
-      const kormir = await KormirProxy.new(["wss://nostr.mutinywallet.com"]);
-      setState({ kormir });
+      try {
+        const kormir = await KormirProxy.new(["wss://nostr.mutinywallet.com"]);
+        const pubkey = await kormir?.get_public_key();
+        console.log("pubkey: ", pubkey);
+        setState({ kormir });
+      } catch (e) {
+        console.error(e);
+      }
     },
     save() {
       localStorage.setItem("setupStatus", "saved");
@@ -46,14 +52,12 @@ export const Provider: ParentComponent = (props) => {
     async import(nsec: string) {
       try {
         console.log("importing nsec: ", nsec);
-        const _kor = await init();
-        await Kormir.restore(nsec);
-        // await state.kormir?.restore(nsec);
-        // const pubkey = await state.kormir?.get_public_key();
-        // console.log("pubkey: ", pubkey);
+        // const _kor = await init();
+        await state.kormir?.restore(nsec);
         setState({ setupStatus: "imported" });
         localStorage.setItem("setupStatus", "imported");
-        // window.location.href = "/";
+        await actions.setup();
+        navigate("/");
       } catch (e) {
         console.error(e);
       }
