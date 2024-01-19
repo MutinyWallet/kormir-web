@@ -37,6 +37,15 @@ self.onconnect = (e: MessageEvent) => {
       if (method === "new") {
         const kormirInstance = await Kormir.new([
           "wss://nostr.mutinywallet.com",
+          "wss://relay.snort.social",
+          "wss://nos.lol",
+          "wss://nostr.fmt.wiz.biz",
+          "wss://relay.damus.io",
+          "wss://relay.primal.net",
+          "wss://nostr.wine",
+          "wss://relay.nostr.band",
+          "wss://nostr.zbd.gg",
+          "wss://relay.nos.social",
         ]);
         kormirInstances[id] = kormirInstance;
         port.postMessage({ id, result: "Instance created" });
