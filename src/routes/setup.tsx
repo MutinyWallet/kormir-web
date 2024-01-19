@@ -1,15 +1,17 @@
+import { SubmitHandler, createForm, required } from "@modular-forms/solid";
 import { Match, Switch, createSignal } from "solid-js";
 import { Button } from "~/components";
+import { TextField } from "~/components/TextField";
 import { useMegaStore } from "~/state/megaStore";
 
-// type ImportForm = {
-//   nsec: string;
-// };
+type ImportForm = {
+  nsec: string;
+};
 
 export function Setup() {
   const [_state, actions] = useMegaStore();
 
-  const [_showNsecField, setShowNsecField] = createSignal(false);
+  const [showNsecField, setShowNsecField] = createSignal(false);
 
   function anon() {
     actions.save();
@@ -19,20 +21,20 @@ export function Setup() {
     setShowNsecField(true);
   }
 
-  // const [_importForm, { Form, Field }] = createForm<ImportForm>({
-  //   initialValues: {
-  //     nsec: "",
-  //   },
-  // });
+  const [_importForm, { Form, Field }] = createForm<ImportForm>({
+    initialValues: {
+      nsec: "",
+    },
+  });
 
-  // const handleSubmit: SubmitHandler<ImportForm> = async (f: ImportForm) => {
-  //   try {
-  //     console.log(f.nsec);
-  //     await actions.import(f.nsec);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
+  const handleSubmit: SubmitHandler<ImportForm> = async (f: ImportForm) => {
+    try {
+      console.log(f.nsec);
+      await actions.import(f.nsec);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <>
@@ -47,7 +49,7 @@ export function Setup() {
         </p>
         <div class="flex flex-col gap-4 mx-auto">
           <Switch>
-            {/* <Match when={showNsecField()}>
+            <Match when={showNsecField()}>
               <Form onSubmit={handleSubmit} class="flex flex-col gap-2">
                 <Field name="nsec" validate={[required("Nsec is required")]}>
                   {(field, props) => (
@@ -62,12 +64,10 @@ export function Setup() {
                 </Field>
                 <Button type="submit">Submit</Button>
               </Form>
-            </Match> */}
+            </Match>
             <Match when={true}>
               <Button onClick={anon}>Anonymous</Button>
-              <Button disabled onClick={imp}>
-                Import
-              </Button>
+              <Button onClick={imp}>Import</Button>
             </Match>
           </Switch>
         </div>

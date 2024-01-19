@@ -36,14 +36,14 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
           outcome: "",
         },
       ],
-      event_maturity: new Date(Date.now() + 864e5).toISOString().split("T")[0], // default to a day from now
+      // event_maturity: new Date(Date.now() + 864e5).toISOString().split("T")[0], // default to a day from now
     },
   });
 
   const handleSubmit: SubmitHandler<EventForm> = async (f: EventForm) => {
     try {
       const outcomes = f.outcomes.map((o) => o.outcome);
-      const event_maturity = new Date(f.event_maturity).getTime() / 1000;
+      const event_maturity = new Date(Date.now()).getTime() / 1000;
 
       console.log(f.name, outcomes, event_maturity);
       // create event
@@ -126,7 +126,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
               )}
             </FieldArray>
           </div>
-          <Field
+          {/* <Field
             name="event_maturity"
             validate={[required("Event date is required")]}
           >
@@ -140,7 +140,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
                 required
               />
             )}
-          </Field>
+          </Field> */}
           <Show when={error()}>
             <InfoBox accent="red">{error()?.message}</InfoBox>
           </Show>
