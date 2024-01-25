@@ -36,7 +36,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
           outcome: "",
         },
       ],
-      event_maturity: undefined,
+      event_maturity: new Date(Date.now() + 864e5).toISOString().split("T")[0], // default to a day from now,
     },
   });
 
@@ -49,13 +49,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
         throw new Error("Outcomes must be unique");
       }
 
-      let event_maturity = f.event_maturity;
-
-      // If there's no event_maturity set, default to one minute from now
-      if (!event_maturity) {
-        console.log("no event maturity");
-        event_maturity = new Date(Date.now() + 60 * 1000).toISOString();
-      }
+      const event_maturity = f.event_maturity;
 
       // Make sure event maturity is in the future
       if (new Date(event_maturity).getTime() < Date.now()) {
@@ -67,7 +61,6 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
         new Date(event_maturity).getTime() / 1000,
       );
 
-      console.log(f.name, outcomes, event_maturity);
       // create event
       const ann = await state.kormir?.create_enum_event(
         f.name,
