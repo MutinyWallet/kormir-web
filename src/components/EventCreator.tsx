@@ -36,21 +36,43 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
           outcome: "",
         },
       ],
-      // event_maturity: new Date(Date.now() + 864e5).toISOString().split("T")[0], // default to a day from now
+      event_maturity: undefined,
     },
   });
 
   const handleSubmit: SubmitHandler<EventForm> = async (f: EventForm) => {
+    setError(undefined);
     try {
       const outcomes = f.outcomes.map((o) => o.outcome);
-      const event_maturity = new Date(Date.now()).getTime() / 1000;
+      // Make sure outcomes are unique
+      if (new Set(outcomes).size !== outcomes.length) {
+        throw new Error("Outcomes must be unique");
+      }
+
+      let event_maturity = f.event_maturity;
+
+      // If there's no event_maturity set, default to one minute from now
+      if (!event_maturity) {
+        console.log("no event maturity");
+        event_maturity = new Date(Date.now() + 60 * 1000).toISOString();
+      }
+
+      // Make sure event maturity is in the future
+      if (new Date(event_maturity).getTime() < Date.now()) {
+        throw new Error("Event maturity must be in the future");
+      }
+
+      // Convert to unix timestamp
+      const event_maturity_timestamp = Math.floor(
+        new Date(event_maturity).getTime() / 1000,
+      );
 
       console.log(f.name, outcomes, event_maturity);
       // create event
       const ann = await state.kormir?.create_enum_event(
         f.name,
         outcomes,
-        event_maturity,
+        event_maturity_timestamp,
       );
       console.log(ann);
 
@@ -126,10 +148,7 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
               )}
             </FieldArray>
           </div>
-          {/* <Field
-            name="event_maturity"
-            validate={[required("Event date is required")]}
-          >
+          <Field name="event_maturity">
             {(field, props) => (
               <TextField
                 {...props}
@@ -137,10 +156,9 @@ export function EventCreator(props: { onSave: () => Promise<void> }) {
                 type="date"
                 error={field.error}
                 label="Event Date"
-                required
               />
             )}
-          </Field> */}
+          </Field>
           <Show when={error()}>
             <InfoBox accent="red">{error()?.message}</InfoBox>
           </Show>
